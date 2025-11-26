@@ -27,6 +27,6 @@ export interface AgentConfig {
 }
 
 export enum ModelType {
-  // El modelo más económico y rápido (Capa gratuita disponible)
-  FLASH = 'gemini-1.5-flash',
+  // Modelo actual recomendado para tareas de texto
+  FLASH = 'gemini-2.5-flash',
 }
