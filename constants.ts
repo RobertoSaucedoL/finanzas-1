@@ -324,7 +324,7 @@ Si evolucionamos a DESARROLLO DE PRODUCTO:
 `;
 
 export const MODEL_OPTIONS = [
-  { value: ModelType.FLASH, label: 'Gemini 2.5 Flash (Recomendado)' },
+  { value: ModelType.FLASH, label: 'Gemini 2.5 Flash (Analista Rápido)' },
 ];
 
 export const DEFAULT_CONFIG = {
