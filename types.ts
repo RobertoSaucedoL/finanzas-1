@@ -27,6 +27,6 @@ export interface AgentConfig {
 }
 
 export enum ModelType {
-  // Modelo estándar actual (rápido, económico y sin errores 404)
+  // Modelo actual recomendado: rápido, económico y sin errores 404
   FLASH = 'gemini-2.5-flash',
 }
