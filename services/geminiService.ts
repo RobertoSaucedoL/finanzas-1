@@ -1,18 +1,18 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-import { AgentConfig, ChatMessage } from "../types";
+import { AgentConfig } from "../types";
 
-// Instancia global lazy-loaded para evitar errores al inicio si falta la key
+// Instancia global lazy-loaded
 let aiClient: GoogleGenAI | null = null;
 
 const getClient = () => {
   if (aiClient) return aiClient;
 
-  // Vite expone variables con import.meta.env
-  // Se requiere que la variable empiece con VITE_ para ser visible en el frontend
-  const apiKey = import.meta.env.VITE_API_KEY;
+  // Accedemos a la variable de entorno usando sintaxis estándar de Vite
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey) {
-    throw new Error("API Key no encontrada. Asegúrate de configurar la variable de entorno VITE_API_KEY en Vercel.");
+    console.error("Falta VITE_GEMINI_API_KEY en variables de entorno");
+    throw new Error("Configuración incompleta: VITE_GEMINI_API_KEY no encontrada. Revisa tu panel de Vercel.");
   }
 
   aiClient = new GoogleGenAI({ apiKey: apiKey });
@@ -26,7 +26,7 @@ export const createChatSession = (config: AgentConfig) => {
 
     console.log("Inicializando chat con modelo:", config.model);
 
-    // Creamos el chat usando el nuevo SDK @google/genai
+    // Creación de chat con SDK moderno @google/genai
     return ai.chats.create({
       model: config.model,
       config: {
@@ -37,24 +37,25 @@ export const createChatSession = (config: AgentConfig) => {
       history: [], 
     });
   } catch (error) {
-    console.error("Error al crear la sesión de chat:", error);
+    console.error("Error crítico al crear sesión:", error);
     throw error;
   }
 };
 
 export async function* streamMessage(
-  chat: any, // Tipo Chat del SDK
+  chat: any, 
   message: string
 ): AsyncGenerator<{ text: string; groundingChunks?: any[] }, void, unknown> {
   
   try {
-    // Llamada de streaming correcta para @google/genai
+    // Llamada de streaming moderna
     const resultStream = await chat.sendMessageStream({
       message: message,
     });
 
+    // Iteración asíncrona estándar (resuelve el error 'p is not async iterable')
     for await (const chunk of resultStream) {
-      // El chunk es de tipo GenerateContentResponse
+      // Casteo seguro al tipo de respuesta
       const responseChunk = chunk as GenerateContentResponse;
       
       const text = responseChunk.text || '';
@@ -63,19 +64,12 @@ export async function* streamMessage(
       yield { text, groundingChunks };
     }
   } catch (error: any) {
-    console.error("❌ Error en streamMessage:", error);
-    
-    const errorMsg = error.toString();
-    
-    // Manejo de errores específicos
-    if (errorMsg.includes("404")) {
-      throw new Error(`Modelo no encontrado (Error 404). El modelo configurado '${chat.model}' puede estar deprecado o mal escrito.`);
-    }
-    
-    if (errorMsg.includes("400") || errorMsg.includes("API_KEY_INVALID")) {
-      throw new Error("API Key inválida (Error 400). Verifica tu configuración en Vercel.");
-    }
+    console.error("❌ Error en stream:", error);
+    const msg = error.toString();
 
+    if (msg.includes("404")) throw new Error("Error 404: El modelo configurado no existe. Verifica 'constants.ts'.");
+    if (msg.includes("400") || msg.includes("API_KEY")) throw new Error("Error de API Key. Verifica VITE_GEMINI_API_KEY en Vercel.");
+    
     throw error;
   }
 }
