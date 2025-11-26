@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Chat } from "@google/genai";
 import MessageList from './components/MessageList';
 import InputArea from './components/InputArea';
 import { createChatSession, streamMessage } from './services/geminiService';
@@ -11,14 +10,20 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Ref to store the active chat session instance
-  const chatSessionRef = useRef<Chat | null>(null);
+  // Ref para almacenar la sesión de chat activa
+  // Nota: No tipamos estrictamente con 'Chat' aquí para evitar conflictos de importación
+  // si el SDK cambia, ya que 'any' en el ref lo maneja el servicio.
+  const chatSessionRef = useRef<any>(null);
   
   // Initialize chat session
   const initChat = useCallback(() => {
-    chatSessionRef.current = createChatSession(config);
-    setMessages([]);
-    console.log("Portaware Intel Agent initialized with model:", config.model);
+    try {
+      chatSessionRef.current = createChatSession(config);
+      setMessages([]);
+      console.log("Portaware Intel Agent inicializado OK.");
+    } catch (e) {
+      console.error("Error al inicializar:", e);
+    }
   }, [config]);
 
   // Initial setup
@@ -29,7 +34,11 @@ const App: React.FC = () => {
   }, [initChat]);
 
   const handleSendMessage = async (text: string) => {
-    if (!chatSessionRef.current) return;
+    if (!chatSessionRef.current) {
+        // Intento de recuperación si la sesión se perdió
+        initChat();
+        if(!chatSessionRef.current) return; 
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -41,7 +50,7 @@ const App: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Create placeholder for AI response
+    // Placeholder para la respuesta de la IA
     const aiMessageId = (Date.now() + 1).toString();
     const aiPlaceholder: ChatMessage = {
       id: aiMessageId,
@@ -80,11 +89,17 @@ const App: React.FC = () => {
           : msg
       ));
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
+      let errorMsg = "Lo siento, ocurrió un error al procesar tu solicitud.";
+      
+      if (error.message.includes("VITE_GEMINI_API_KEY")) {
+        errorMsg = "Error de configuración: Falta la API Key en Vercel.";
+      }
+
       setMessages(prev => prev.map(msg => 
         msg.id === aiMessageId 
-          ? { ...msg, text: "Lo siento, ocurrió un error al procesar tu solicitud. Por favor intenta de nuevo.", isStreaming: false }
+          ? { ...msg, text: errorMsg, isStreaming: false }
           : msg
       ));
     } finally {
