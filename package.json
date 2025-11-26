@@ -8,9 +8,15 @@
     "build": "vite build",
     "preview": "vite preview"
   },
- "dependencies": {
-  "@google/genai": "^0.6.0",
-  "react": "^18.3.1",
-  "react-dom": "^18.3.1"
+  "dependencies": {
+    "@google/genai": "1.30.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.1",
+    "@vitejs/plugin-react": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
   }
 }
