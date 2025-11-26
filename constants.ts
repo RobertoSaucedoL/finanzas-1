@@ -324,13 +324,13 @@ Si evolucionamos a DESARROLLO DE PRODUCTO:
 `;
 
 export const MODEL_OPTIONS = [
-  { value: ModelType.FLASH, label: 'Gemini 1.5 Flash (Rápido)' },
-  { value: ModelType.PRO, label: 'Gemini 1.5 Pro (Razonamiento)' },
+  { value: ModelType.FLASH, label: 'Gemini 2.5 Flash (Económico)' },
+  { value: ModelType.PRO, label: 'Gemini 3.0 Pro (Avanzado)' },
 ];
 
 export const DEFAULT_CONFIG = {
-  model: ModelType.FLASH, // Cambiado a FLASH para evitar errores 404 y asegurar velocidad
+  model: ModelType.FLASH, // Cambiado a FLASH para evitar errores 404
   systemInstruction: DEFAULT_SYSTEM_INSTRUCTION,
-  useSearch: true, // Siempre activo
+  useSearch: true, 
   temperature: 0.3,
 };
