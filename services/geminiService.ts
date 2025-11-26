@@ -2,15 +2,14 @@ import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { AgentConfig } from "../types";
 
 export const createChatSession = (config: AgentConfig): Chat => {
-  // En Vercel y Vite, las variables de entorno se acceden así.
-  // Asegúrate de tener VITE_API_KEY configurada en Vercel.
-  const apiKey = import.meta.env.VITE_API_KEY;
+  // En Vercel, las variables de entorno expuestas al cliente deben empezar con VITE_
+  const apiKey = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
 
   if (!apiKey || apiKey.length < 10) {
-    console.error("❌ ERROR CRÍTICO: API Key no encontrada o inválida.");
-    console.error("En Vercel: Ve a Settings > Environment Variables y asegura que se llame 'VITE_API_KEY'.");
+    console.error("❌ ERROR CRÍTICO: API Key no encontrada.");
+    console.error("Asegúrate de configurar VITE_API_KEY en las variables de entorno de Vercel.");
     
-    throw new Error("Falta configuración de API Key (VITE_API_KEY)");
+    throw new Error("Falta configuración de API Key. Revisa la configuración de Vercel (VITE_API_KEY).");
   }
 
   try {
@@ -56,11 +55,11 @@ export async function* streamMessage(
     const errorMsg = error.toString();
     
     if (errorMsg.includes("400") || errorMsg.includes("API_KEY_INVALID")) {
-      throw new Error("API Key inválida. Verifica que tu VITE_API_KEY en Vercel sea correcta y no tenga espacios.");
+      throw new Error("API Key inválida (Error 400). Verifica que tu variable de entorno VITE_API_KEY en Vercel sea correcta.");
     }
     
     if (errorMsg.includes("404")) {
-      throw new Error(`El modelo solicitado no está disponible. Asegúrate de usar 'gemini-1.5-flash'. Error original: ${errorMsg}`);
+      throw new Error(`El modelo no está disponible (Error 404). Verifica constants.ts. Error original: ${errorMsg}`);
     }
 
     if (errorMsg.includes("fetch")) {
