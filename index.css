@@ -1,8 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* 
+   Dejamos esto vacío intencionalmente.
+   Usamos Tailwind vía CDN en index.html para asegurar la estética exacta
+   que solicitaste, evitando problemas de compilación en Vercel.
+*/
