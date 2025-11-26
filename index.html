@@ -8,7 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- MOTOR DE DISEÑO: Tailwind CDN para mantener la estética solicitada -->
+    <!-- 
+      NOTA: Usamos Tailwind vía CDN para mantener la estética exacta solicitada sin pasos extra de build.
+      En un entorno de producción enterprise, se recomienda instalar tailwindcss vía npm y postcss.
+    -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -42,7 +45,7 @@
       .scrollbar-hide::-webkit-scrollbar { display: none; }
       .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
-
+<script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
