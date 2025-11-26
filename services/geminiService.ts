@@ -8,7 +8,7 @@ const getClient = () => {
   if (aiClient) return aiClient;
 
   // IMPORTANTE: Buscamos la clave en TODAS las variables posibles.
-  const apiKey = 
+  let apiKey = 
     import.meta.env.VITE_GEMINI_API_KEY || 
     import.meta.env.VITE_API_KEY || 
     import.meta.env.API_KEY; 
@@ -16,16 +16,17 @@ const getClient = () => {
   // Debug seguro (solo muestra si existe o no, no la clave completa)
   if (apiKey) {
     console.log(`🔑 API Key detectada (empieza con): ${apiKey.substring(0, 4)}...`);
+    // CRÍTICO: Eliminar comillas accidentales que a veces se copian en Vercel
+    apiKey = apiKey.replace(/["']/g, "").trim();
   } else {
     console.error("❌ ERROR CRÍTICO: No se encontró ninguna API Key en las variables de entorno.");
   }
 
-  if (!apiKey || apiKey.trim().length === 0) {
+  if (!apiKey || apiKey.length === 0) {
     throw new Error("API Key no encontrada. Por favor configura VITE_GEMINI_API_KEY en Vercel (Settings > Environment Variables).");
   }
 
-  // .trim() es vital por si copiaste la clave con un espacio al final
-  aiClient = new GoogleGenAI({ apiKey: apiKey.trim() });
+  aiClient = new GoogleGenAI({ apiKey: apiKey });
   return aiClient;
 };
 
@@ -59,10 +60,9 @@ export async function* streamMessage(
 ): AsyncGenerator<{ text: string; groundingChunks?: any[] }, void, unknown> {
   
   try {
-    // 1. Llamada de streaming con el nuevo SDK
-    const resultStream = await chat.sendMessageStream({
-      message: message,
-    });
+    // 1. Llamada de streaming con el nuevo SDK.
+    // Pasamos el string directo para evitar errores de formato JSON.
+    const resultStream = await chat.sendMessageStream(message);
 
     // 2. Iteración correcta: El nuevo SDK devuelve un iterable asíncrono directo
     for await (const chunk of resultStream) {
@@ -84,7 +84,7 @@ export async function* streamMessage(
     
     // Detectar error de API Key (código 400 o mensaje explícito)
     if (msg.includes("400") || msg.includes("API Key") || msg.includes("API_KEY")) {
-      throw new Error("Error de API Key. Vercel no está pasando la clave. Verifica Settings > Environment Variables.");
+      throw new Error("Error de API Key. Vercel no está pasando la clave correctamente. Verifica Settings > Environment Variables.");
     }
     
     throw error;
