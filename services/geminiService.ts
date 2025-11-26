@@ -61,9 +61,9 @@ export async function* streamMessage(
   
   try {
     // 1. Llamada de streaming con el nuevo SDK.
-    // CORRECCIÓN FINAL: El SDK espera { message: string } para chats.
-    // Usar 'parts' genera el error 'ContentUnion is required'.
-    const resultStream = await chat.sendMessageStream({ message: message });
+    // CORRECCIÓN FINAL: Pasamos el mensaje DIRECTAMENTE como string.
+    // No usar objetos { message: ... } ni { parts: ... } si es solo texto.
+    const resultStream = await chat.sendMessageStream(message);
 
     // 2. Iteración correcta: El nuevo SDK devuelve un iterable asíncrono directo
     for await (const chunk of resultStream) {
@@ -89,7 +89,7 @@ export async function* streamMessage(
     }
 
     if (msg.includes("ContentUnion")) {
-       throw new Error("Error de formato interno (ContentUnion). Por favor contacta al desarrollador.");
+       throw new Error("Error de formato (ContentUnion). Intenta refrescar la página.");
     }
     
     throw error;
