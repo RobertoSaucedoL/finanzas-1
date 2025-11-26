@@ -61,8 +61,9 @@ export async function* streamMessage(
   
   try {
     // 1. Llamada de streaming con el nuevo SDK.
-    // CORRECCIÓN CRÍTICA: Envolver el mensaje en { parts: [{ text }] } para evitar error ContentUnion
-    const resultStream = await chat.sendMessageStream({ parts: [{ text: message }] });
+    // CORRECCIÓN FINAL: El SDK espera { message: string } para chats.
+    // Usar 'parts' genera el error 'ContentUnion is required'.
+    const resultStream = await chat.sendMessageStream({ message: message });
 
     // 2. Iteración correcta: El nuevo SDK devuelve un iterable asíncrono directo
     for await (const chunk of resultStream) {
@@ -85,6 +86,10 @@ export async function* streamMessage(
     // Detectar error de API Key (código 400 o mensaje explícito)
     if (msg.includes("400") || msg.includes("API Key") || msg.includes("API_KEY")) {
       throw new Error("Error de API Key. Vercel no está pasando la clave correctamente. Verifica Settings > Environment Variables.");
+    }
+
+    if (msg.includes("ContentUnion")) {
+       throw new Error("Error de formato interno (ContentUnion). Por favor contacta al desarrollador.");
     }
     
     throw error;
