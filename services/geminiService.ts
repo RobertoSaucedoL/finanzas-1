@@ -1,21 +1,9 @@
 import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { AgentConfig } from "../types";
 
-// Helper para obtener el cliente de forma segura y perezosa (lazy)
-const getClient = () => {
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
-    console.error("CRÍTICO: No se encontró la API KEY. Asegúrate de configurar la variable de entorno API_KEY en Vercel o en tu archivo .env");
-    // Retornamos un cliente dummy o lanzamos error controlado para no romper la UI inmediatamente
-    throw new Error("API Key no configurada");
-  }
-  return new GoogleGenAI({ apiKey });
-};
-
 export const createChatSession = (config: AgentConfig): Chat => {
   try {
-    const ai = getClient();
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const tools = config.useSearch ? [{ googleSearch: {} }] : [];
 
     return ai.chats.create({
@@ -50,7 +38,6 @@ export async function* streamMessage(
       yield { text, groundingChunks };
     }
   } catch (error) {
-    console.error("Error in streamMessage:", error);
+    console.error("Error crítico en streamMessage:", error);
     throw error;
   }
-}
