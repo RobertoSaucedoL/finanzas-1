@@ -324,8 +324,8 @@ Si evolucionamos a DESARROLLO DE PRODUCTO:
 `;
 
 export const MODEL_OPTIONS = [
-  { value: ModelType.FLASH, label: 'Gemini 1.5 Flash (Económico)' },
-  { value: ModelType.PRO, label: 'Gemini 1.5 Pro (Avanzado)' },
+  { value: ModelType.FLASH, label: 'Gemini 1.5 Flash (Rápido y Económico)' },
+  { value: ModelType.PRO, label: 'Gemini 1.5 Pro (Razonamiento Complejo)' },
 ];
 
 export const DEFAULT_CONFIG = {
