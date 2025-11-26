@@ -27,8 +27,8 @@ export interface AgentConfig {
 }
 
 export enum ModelType {
-  // Versiones estables y económicas
+  // El modelo más económico y rápido (Capa gratuita disponible)
   FLASH = 'gemini-1.5-flash',
+  // Modelo para razonamiento complejo (Más costoso)
   PRO = 'gemini-1.5-pro'
 }
-
