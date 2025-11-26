@@ -8,18 +8,24 @@ const getClient = () => {
   if (aiClient) return aiClient;
 
   // IMPORTANTE: Buscamos la clave en TODAS las variables posibles.
-  // Gracias al cambio en vite.config.ts, ahora podemos leer 'API_KEY' directa también.
   const apiKey = 
     import.meta.env.VITE_GEMINI_API_KEY || 
     import.meta.env.VITE_API_KEY || 
-    import.meta.env.API_KEY; // Esta funcionará si la llamaste solo API_KEY en Vercel
+    import.meta.env.API_KEY; 
 
-  if (!apiKey || apiKey.length === 0) {
-    console.error("❌ ERROR CRÍTICO: No se encontró ninguna API Key.");
-    throw new Error("Falta la API Key. Asegúrate de tener 'VITE_GEMINI_API_KEY' o 'API_KEY' en las variables de entorno de Vercel.");
+  // Debug seguro (solo muestra si existe o no, no la clave completa)
+  if (apiKey) {
+    console.log(`🔑 API Key detectada (empieza con): ${apiKey.substring(0, 4)}...`);
+  } else {
+    console.error("❌ ERROR CRÍTICO: No se encontró ninguna API Key en las variables de entorno.");
   }
 
-  aiClient = new GoogleGenAI({ apiKey: apiKey });
+  if (!apiKey || apiKey.trim().length === 0) {
+    throw new Error("API Key no encontrada. Por favor configura VITE_GEMINI_API_KEY en Vercel (Settings > Environment Variables).");
+  }
+
+  // .trim() es vital por si copiaste la clave con un espacio al final
+  aiClient = new GoogleGenAI({ apiKey: apiKey.trim() });
   return aiClient;
 };
 
