@@ -1,11 +1,3 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
+// Archivo vacío intencionalmente.
+// Usamos Tailwind vía CDN en index.html.
+export default {};
