@@ -2,13 +2,12 @@ import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { AgentConfig } from "../types";
 
 export const createChatSession = (config: AgentConfig): Chat => {
-  // Intentamos obtener la key de las variables de entorno de Vite.
-  // En Vercel, asegúrate de configurar VITE_API_KEY.
+  // En Vercel y Vite, las variables de entorno se acceden así.
+  // Asegúrate de tener VITE_API_KEY configurada en Vercel.
   const apiKey = import.meta.env.VITE_API_KEY;
 
   if (!apiKey || apiKey.length < 10) {
     console.error("❌ ERROR CRÍTICO: API Key no encontrada o inválida.");
-    console.error("En local: Revisa tu archivo .env");
     console.error("En Vercel: Ve a Settings > Environment Variables y asegura que se llame 'VITE_API_KEY'.");
     
     throw new Error("Falta configuración de API Key (VITE_API_KEY)");
