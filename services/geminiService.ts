@@ -61,8 +61,8 @@ export async function* streamMessage(
   
   try {
     // 1. Llamada de streaming con el nuevo SDK.
-    // Pasamos el string directo para evitar errores de formato JSON.
-    const resultStream = await chat.sendMessageStream(message);
+    // CORRECCIÓN CRÍTICA: Envolver el mensaje en { parts: [{ text }] } para evitar error ContentUnion
+    const resultStream = await chat.sendMessageStream({ parts: [{ text: message }] });
 
     // 2. Iteración correcta: El nuevo SDK devuelve un iterable asíncrono directo
     for await (const chunk of resultStream) {
