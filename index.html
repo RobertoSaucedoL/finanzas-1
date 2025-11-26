@@ -4,62 +4,69 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portaware | Inteligencia Comercial</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- 
-      NOTA: Usamos Tailwind vía CDN para mantener la estética exacta solicitada sin pasos extra de build.
-      En un entorno de producción enterprise, se recomienda instalar tailwindcss vía npm y postcss.
-    -->
+
+    <!-- Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind por CDN (ok por ahora, solo warning) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Montserrat', 'sans-serif'],
+              sans: ["Montserrat", "sans-serif"],
             },
             colors: {
               brand: {
-                dark: '#2E3A47',
-                accent: '#D98918',
-              }
-            }
-          }
-        }
-      }
+                dark: "#2E3A47",
+                accent: "#D98918",
+              },
+            },
+          },
+        },
+      };
     </script>
-    
+
     <style>
       body {
-        font-family: 'Montserrat', sans-serif;
-        background-color: #FFFFFF;
-        color: #2E3A47;
+        font-family: "Montserrat", sans-serif;
+        background-color: #ffffff;
+        color: #2e3a47;
       }
       /* Custom scrollbar */
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
-      ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-      .scrollbar-hide::-webkit-scrollbar { display: none; }
-      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     </style>
+  </head>
 
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
-  }
-}
-</script>
-</head>
   <body>
     <div id="root"></div>
+    <!-- Entrada de tu app (ajusta la ruta si usas /src/main.tsx) -->
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
