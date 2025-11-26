@@ -27,8 +27,8 @@ export interface AgentConfig {
 }
 
 export enum ModelType {
-  // El modelo más económico, rápido y estable. Ideal para producción.
+  // Versiones estables y económicas
   FLASH = 'gemini-1.5-flash',
-  // Modelo de mayor capacidad
   PRO = 'gemini-1.5-pro'
 }
+
