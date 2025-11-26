@@ -2,15 +2,15 @@ import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { AgentConfig } from "../types";
 
 export const createChatSession = (config: AgentConfig): Chat => {
-  // CRÍTICO: En Vercel, la variable debe llamarse VITE_API_KEY para ser visible en el frontend.
+  // Intentamos obtener la key de las variables de entorno de Vite.
+  // En Vercel, asegúrate de configurar VITE_API_KEY.
   const apiKey = import.meta.env.VITE_API_KEY;
 
   if (!apiKey || apiKey.length < 10) {
-    console.error("❌ ERROR CRÍTICO: API Key no encontrada.");
-    console.error("Solución en Vercel: Ve a Settings > Environment Variables y agrega 'VITE_API_KEY' con tu clave.");
+    console.error("❌ ERROR CRÍTICO: API Key no encontrada o inválida.");
+    console.error("En local: Revisa tu archivo .env");
+    console.error("En Vercel: Ve a Settings > Environment Variables y asegura que se llame 'VITE_API_KEY'.");
     
-    // Devolvemos un objeto dummy para que no crashee la UI inmediatamente,
-    // el error saltará cuando intenten enviar mensaje.
     throw new Error("Falta configuración de API Key (VITE_API_KEY)");
   }
 
@@ -53,13 +53,21 @@ export async function* streamMessage(
     }
   } catch (error: any) {
     console.error("❌ Error en streamMessage:", error);
-    // Si es un error 400/404, es probable que la KEY sea inválida o el modelo no exista.
-    if (error.toString().includes("400") || error.toString().includes("API key not valid")) {
-      throw new Error("Tu API Key es inválida o no está configurada correctamente en Vercel (Revisa VITE_API_KEY).");
+    
+    const errorMsg = error.toString();
+    
+    if (errorMsg.includes("400") || errorMsg.includes("API_KEY_INVALID")) {
+      throw new Error("API Key inválida. Verifica que tu VITE_API_KEY en Vercel sea correcta y no tenga espacios.");
     }
-    if (error.toString().includes("404")) {
-      throw new Error("El modelo seleccionado no está disponible para tu clave API. Intenta con Gemini 1.5 Flash.");
+    
+    if (errorMsg.includes("404")) {
+      throw new Error(`El modelo solicitado no está disponible. Asegúrate de usar 'gemini-1.5-flash'. Error original: ${errorMsg}`);
     }
+
+    if (errorMsg.includes("fetch")) {
+      throw new Error("Error de conexión. Verifica tu internet o si la API de Google tiene interrupciones.");
+    }
+
     throw error;
   }
 }
