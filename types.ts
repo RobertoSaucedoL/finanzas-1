@@ -27,7 +27,8 @@ export interface AgentConfig {
 }
 
 export enum ModelType {
-  FLASH = 'gemini-2.5-flash',
-  PRO = 'gemini-3-pro-preview',
-  FLASH_LITE = 'gemini-flash-lite-latest'
+  // El modelo más económico, rápido y estable (Recomendado para Vercel gratuito)
+  FLASH = 'gemini-1.5-flash',
+  // Modelo de mayor razonamiento
+  PRO = 'gemini-1.5-pro'
 }
