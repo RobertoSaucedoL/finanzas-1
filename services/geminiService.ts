@@ -7,12 +7,16 @@ let aiClient: GoogleGenAI | null = null;
 const getClient = () => {
   if (aiClient) return aiClient;
 
-  // IMPORTANTE: Leemos la API KEY desde la variable de entorno estándar de Vite
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  // IMPORTANTE: Buscamos la clave en TODAS las variables posibles.
+  // Gracias al cambio en vite.config.ts, ahora podemos leer 'API_KEY' directa también.
+  const apiKey = 
+    import.meta.env.VITE_GEMINI_API_KEY || 
+    import.meta.env.VITE_API_KEY || 
+    import.meta.env.API_KEY; // Esta funcionará si la llamaste solo API_KEY en Vercel
 
-  if (!apiKey) {
-    console.error("Falta VITE_GEMINI_API_KEY en variables de entorno");
-    throw new Error("Configuración incompleta: VITE_GEMINI_API_KEY no encontrada. Revisa tu panel de Vercel (Settings > Environment Variables).");
+  if (!apiKey || apiKey.length === 0) {
+    console.error("❌ ERROR CRÍTICO: No se encontró ninguna API Key.");
+    throw new Error("Falta la API Key. Asegúrate de tener 'VITE_GEMINI_API_KEY' o 'API_KEY' en las variables de entorno de Vercel.");
   }
 
   aiClient = new GoogleGenAI({ apiKey: apiKey });
@@ -71,7 +75,11 @@ export async function* streamMessage(
 
     // Mensajes de error amigables para depuración
     if (msg.includes("404")) throw new Error("Error 404: El modelo configurado no existe. Asegúrate de usar 'gemini-2.5-flash'.");
-    if (msg.includes("400") || msg.includes("API_KEY")) throw new Error("Error de API Key. Verifica que VITE_GEMINI_API_KEY esté configurada en Vercel.");
+    
+    // Detectar error de API Key (código 400 o mensaje explícito)
+    if (msg.includes("400") || msg.includes("API Key") || msg.includes("API_KEY")) {
+      throw new Error("Error de API Key. Vercel no está pasando la clave. Verifica Settings > Environment Variables.");
+    }
     
     throw error;
   }
