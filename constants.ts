@@ -329,7 +329,6 @@ export const MODEL_OPTIONS = [
 ];
 
 export const DEFAULT_CONFIG = {
-  // CRÍTICO: Usar Flash por defecto para evitar error 404 de modelos antiguos
   model: ModelType.FLASH, 
   systemInstruction: DEFAULT_SYSTEM_INSTRUCTION,
   useSearch: true, 
