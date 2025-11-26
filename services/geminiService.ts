@@ -2,8 +2,18 @@ import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { AgentConfig } from "../types";
 
 export const createChatSession = (config: AgentConfig): Chat => {
+  // En Vite/Vercel, usamos VITE_API_KEY a través de import.meta.env
+  // También revisamos process.env como respaldo por si acaso.
+  const apiKey = import.meta.env.VITE_API_KEY || (typeof process !== 'undefined' ? process.env.API_KEY : undefined);
+
+  if (!apiKey || apiKey.length < 10) {
+    console.error("API Key no encontrada o inválida. Asegúrate de configurar la variable de entorno VITE_API_KEY en Vercel.");
+    // No lanzamos error aquí para no romper la app al cargar, pero el primer mensaje fallará.
+  }
+
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // Si apiKey es undefined, GoogleGenAI lanzará un error cuando se intente usar.
+    const ai = new GoogleGenAI({ apiKey: apiKey || 'DUMMY_KEY_TO_PREVENT_INIT_CRASH' });
     const tools = config.useSearch ? [{ googleSearch: {} }] : [];
 
     return ai.chats.create({
@@ -38,6 +48,7 @@ export async function* streamMessage(
       yield { text, groundingChunks };
     }
   } catch (error) {
-    console.error("Error crítico en streamMessage:", error);
+    console.error("Error en streamMessage:", error);
     throw error;
   }
+}
