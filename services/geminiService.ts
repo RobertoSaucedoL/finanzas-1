@@ -7,12 +7,12 @@ let aiClient: GoogleGenAI | null = null;
 const getClient = () => {
   if (aiClient) return aiClient;
 
-  // Accedemos a la variable de entorno usando sintaxis estándar de Vite
+  // IMPORTANTE: Leemos la API KEY desde la variable de entorno estándar de Vite
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey) {
     console.error("Falta VITE_GEMINI_API_KEY en variables de entorno");
-    throw new Error("Configuración incompleta: VITE_GEMINI_API_KEY no encontrada. Revisa tu panel de Vercel.");
+    throw new Error("Configuración incompleta: VITE_GEMINI_API_KEY no encontrada. Revisa tu panel de Vercel (Settings > Environment Variables).");
   }
 
   aiClient = new GoogleGenAI({ apiKey: apiKey });
@@ -22,11 +22,12 @@ const getClient = () => {
 export const createChatSession = (config: AgentConfig) => {
   try {
     const ai = getClient();
+    // En el nuevo SDK @google/genai, configuramos las herramientas así:
     const tools = config.useSearch ? [{ googleSearch: {} }] : [];
 
     console.log("Inicializando chat con modelo:", config.model);
 
-    // Creación de chat con SDK moderno @google/genai
+    // Creación de chat con SDK moderno
     return ai.chats.create({
       model: config.model,
       config: {
@@ -48,17 +49,18 @@ export async function* streamMessage(
 ): AsyncGenerator<{ text: string; groundingChunks?: any[] }, void, unknown> {
   
   try {
-    // Llamada de streaming moderna
+    // 1. Llamada de streaming con el nuevo SDK
     const resultStream = await chat.sendMessageStream({
       message: message,
     });
 
-    // Iteración asíncrona estándar (resuelve el error 'p is not async iterable')
+    // 2. Iteración correcta: El nuevo SDK devuelve un iterable asíncrono directo
     for await (const chunk of resultStream) {
-      // Casteo seguro al tipo de respuesta
+      // Casteo seguro para TypeScript
       const responseChunk = chunk as GenerateContentResponse;
       
       const text = responseChunk.text || '';
+      // Acceso seguro a los datos de grounding (fuentes)
       const groundingChunks = responseChunk.candidates?.[0]?.groundingMetadata?.groundingChunks;
       
       yield { text, groundingChunks };
@@ -67,8 +69,9 @@ export async function* streamMessage(
     console.error("❌ Error en stream:", error);
     const msg = error.toString();
 
-    if (msg.includes("404")) throw new Error("Error 404: El modelo configurado no existe. Verifica 'constants.ts'.");
-    if (msg.includes("400") || msg.includes("API_KEY")) throw new Error("Error de API Key. Verifica VITE_GEMINI_API_KEY en Vercel.");
+    // Mensajes de error amigables para depuración
+    if (msg.includes("404")) throw new Error("Error 404: El modelo configurado no existe. Asegúrate de usar 'gemini-2.5-flash'.");
+    if (msg.includes("400") || msg.includes("API_KEY")) throw new Error("Error de API Key. Verifica que VITE_GEMINI_API_KEY esté configurada en Vercel.");
     
     throw error;
   }
